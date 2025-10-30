@@ -1,0 +1,67 @@
+import sys
+from collections import Counter
+
+# read n, m
+n, m = map(int, sys.stdin.readline().split())
+
+# read arrays
+A = list(map(int, sys.stdin.readline().split())) if n > 0 else []
+B = list(map(int, sys.stdin.readline().split())) if m > 0 else []
+
+# count elements of second array
+countB = Counter(B)
+
+result = []
+
+# iterate in order of A
+for x in A:
+    if countB[x] > 0:
+        result.append(x)
+        countB[x] -= 1
+
+# print result
+print(*result)
+
+
+Problem C: House of love
+Once upon a time, in one university, created a one organization called "House of love" in which friendship is the main value. So they created one test to know level of their friendship. Two person write some numbers and gives it to you, to check common numbers.
+
+Input format
+First line contain two numbers n,m. Size of arrays. Next 2 line contain n numbers of first person and m numbers of second.
+
+Output format
+Print common numbers.
+
+Examples
+Input
+4 2
+1 2 2 1
+2 2
+Output
+2 2 
+Input
+3 5
+4 9 5
+4 3 2 1 9
+Output
+4 9 
+Input
+0 1
+1
+Output
+Input
+4 2
+1 2 3 1
+2 2
+Output
+2 
+
+
+✅ Important Observation From Samples
+
+You must print the multiset intersection, keeping the order of the first person’s array.
+
+✔ Multiplicity = min(count in first, count in second)
+✔ Order = order of the FIRST array
+✔ No extra messages
+✔ If nothing common → print NOTHING (empty line)
