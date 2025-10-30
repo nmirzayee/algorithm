@@ -65,3 +65,60 @@ You must print the multiset intersection, keeping the order of the first person�
 ✔ Order = order of the FIRST array
 ✔ No extra messages
 ✔ If nothing common → print NOTHING (empty line)
+
+✅ Algorithm (Step-by-step)
+
+Input:
+
+Two integers n and m — sizes of arrays
+
+Array A of size n (first person)
+
+Array B of size m (second person)
+
+Output:
+
+The common numbers between A and B
+
+Order must follow A
+
+Each number appears min(count in A, count in B) times
+
+✅ Steps
+
+Read inputs
+Read integers n and m, then read arrays A and B.
+
+Create a frequency table for array B
+
+Count how many times each number appears in B.
+
+For example, if B = [2,2,3] → frequency = {2:2, 3:1}.
+
+Initialize an empty list result
+This will store the common numbers in correct order.
+
+Traverse array A from left to right
+For each element x in A:
+
+Check if B still has this number available (frequency[x] > 0).
+
+If yes:
+
+Add x to the result.
+
+Decrease the frequency of x in B by 1.
+
+When traversal ends, print the result list
+
+Print all numbers separated by spaces.
+
+If result is empty → print nothing (empty line).
+
+✅ Explanation of Why This Works
+
+Using frequency ensures we print a number only as many times as it appears in both arrays.
+
+Traversing A ensures the output order follows the first person’s list, exactly like the samples.
+
+This produces a multiset intersection with stable order.
