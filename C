@@ -22,6 +22,27 @@ for x in A:
 # print result
 print(*result)
 
+import sys
+from collections import Counter
+
+n, m = map(int, sys.stdin.readline().split())
+A = list(map(int, sys.stdin.readline().split())) if n > 0 else []
+B = list(map(int, sys.stdin.readline().split())) if m > 0 else []
+
+countA = Counter(A)
+countB = Counter(B)
+
+result = []
+
+# Go through all possible numbers in sorted order
+for x in sorted(countA.keys() | countB.keys()):
+    common = min(countA[x], countB[x])
+    for _ in range(common):
+        result.append(x)
+
+print(*result)
+
+
 
 Problem C: House of love
 Once upon a time, in one university, created a one organization called "House of love" in which friendship is the main value. So they created one test to know level of their friendship. Two person write some numbers and gives it to you, to check common numbers.
