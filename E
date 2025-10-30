@@ -1,0 +1,82 @@
+import sys
+
+n, m = map(int, sys.stdin.readline().split())
+rows = []
+
+for _ in range(n):
+    arr = list(map(int, sys.stdin.readline().split()))
+    rows.append((sum(arr), arr))
+
+# Sort:
+# 1) By sum DESC  → -sum
+# 2) Lexicographically ASC → arr
+rows.sort(key=lambda x: (-x[0], x[1]))
+
+for s, arr in rows:
+    print(*arr)
+✅ Algorithm for Problem E: Sorter
+Input
+
+Integer n — number of rows
+
+Integer m — number of elements in each row
+
+Then n rows, each containing m integers
+
+Output
+
+All rows sorted according to:
+
+Descending order of the sum of elements
+
+If sums are equal → Ascending lexicographical order
+
+✅ Step-by-Step Algorithm
+
+Read n and m.
+
+Create an empty list rows to store each row together with its sum.
+
+For each of the next n rows:
+
+Read the row as a list of integers.
+
+Compute the sum of the elements.
+
+Store a pair (sum_of_row, row_list) inside rows.
+
+Sort the list rows using a custom key:
+
+Primary key: negative of the row sum -sum_of_row
+→ ensures descending order of sums
+
+Secondary key: the row itself
+→ lexicographical comparison of lists (ascending)
+
+Formally:
+
+sort by key = (-sum_of_row, row_list)
+
+
+After sorting, iterate over all pairs in rows and print only the row list.
+
+✅ Why This Works
+
+Sorting by -sum_of_row ensures:
+
+Larger sum → smaller negative value → appears earlier.
+
+If two rows have the same sum:
+
+Python compares lists element-by-element.
+
+This gives lexicographically ascending order, as required.
+
+✅ Time Complexity
+
+Computing sums: O(n · m)
+
+Sorting rows: O(n log n) (lexicographical comparison of lists takes O(m))
+
+Total: O(n log n + n · m)
+→ Efficient for all typical constraints.
