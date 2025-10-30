@@ -1,0 +1,98 @@
+import sys
+
+# Read first array
+n = int(sys.stdin.readline().strip())
+A = list(map(int, sys.stdin.readline().split()))
+
+# Read second array
+m = int(sys.stdin.readline().strip())
+B = list(map(int, sys.stdin.readline().split()))
+
+i = 0
+j = 0
+result = []
+
+# Merge two sorted arrays
+while i < n and j < m:
+    if A[i] <= B[j]:
+        result.append(A[i])
+        i += 1
+    else:
+        result.append(B[j])
+        j += 1
+
+# Add remaining elements
+while i < n:
+    result.append(A[i])
+    i += 1
+
+while j < m:
+    result.append(B[j])
+    j += 1
+
+# Print result
+print(*result)
+
+Problem B: Merge
+Given two sorted integer arrays 
+ and 
+, merge 
+ into 
+ as one sorted array.
+
+Input format
+The first line contains one integer 
+ 
+ — 
+ size. The second line contains 
+ integers 
+ 
+ — elements of array. The third line contains one integer 
+ 
+ — 
+ size. The next line contains 
+ integers 
+ 
+ — elements of array.
+
+Output format
+Array B into sorted order.
+
+Examples
+Input
+5
+4 5 6 7 10
+5
+2 4 6 7 8
+Output
+2 4 4 5 6 6 7 7 8 10 
+Input
+3
+1 4 7
+1
+6
+Output
+1 4 6 7 
+Input
+4
+2 5 7 8
+3
+2 4 9
+Output
+2 2 4 5 7 8 9 
+Input
+2
+3 10
+4
+1 3 6 8
+Output
+1 3 3 6 8 10 
+Input
+1
+4
+4
+1 1 5 6
+Output
+1 1 4 5 6 
+
+
