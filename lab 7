@@ -46,3 +46,41 @@ f aabc ddfd fbbe baaad
 ae cdb bbd fddf badcf aedbe 
 b bc ada aabc fbee eaced dadab 
 edde fcaa adbf beec bedaf 
+
+For each set:
+
+You must sort the strings by their length (shortest first).
+
+If two strings have equal length, you must keep their original order (stable sorting).
+
+Print the sorted strings with a space after each word.
+
+Each set is printed on a new line.
+
+Python’s built-in sorted() is stable, so equal-length strings automatically keep original order.
+
+✅ Algorithm Explanation (Step-by-Step)
+Algorithm:
+
+For each set of strings:
+
+Read the input line.
+
+Split the line into a list of strings.
+
+Sort the list by:
+→ key = len(string)
+(Since Python sort is stable, equal-length items keep original order.)
+
+Print the result as space-separated words and add a trailing space.
+
+Time complexity:
+
+Sorting each list: O(n log n)
+
+Total: T × O(n log n) (well within limits)
+
+Why Python’s sort works perfectly?
+
+Because Python’s sort uses Timsort, which is stable.
+Stable means:
