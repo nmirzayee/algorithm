@@ -95,4 +95,32 @@ Input
 Output
 1 1 4 5 6 
 
+✅ Arrays A and B are already sorted
+✅ You must merge them into a single sorted array
+✅ No main() function (as you requested earlier)
+✅ Works for ALL sample tests
+
+✅ Algorithm Explanation (Simple & Clear)
+
+We use the standard two-pointer merge algorithm (same as in Merge Sort):
+
+Have two indices:
+
+i for array A
+
+j for array B
+
+While both indices are inside their arrays:
+
+Compare A[i] and B[j]
+
+Append the smaller to result
+
+Move the pointer forward
+
+When one array ends, append the rest of the other array.
+
+Time complexity:
+✅ O(n + m) — linear merging
+
 
