@@ -1,0 +1,48 @@
+import sys
+
+t = int(sys.stdin.readline().strip())
+
+for _ in range(t):
+    line = sys.stdin.readline().strip()
+    words = line.split()
+    words.sort(key=len)     # stable sort keeps original order
+    print(*words)
+
+
+Problem A: Simple Merge
+Given a set of strings print the set sorted according to their size. If the size of the strings are equal, must maintain the original order of the set.
+
+Input format
+The first line of input has an integer 
+ that indicates the number of sets of strings, each set may contain between 
+ and 
+ inclusive elements, and each of the strings of the set may contain between 
+ and 
+ inclusive characters(’
+’ to ’
+’).
+
+Output format
+The output should contain the set of input strings ordered by the length of strings.A blank space must be printed between two words.
+
+Examples
+Input
+3
+ab cd e j asd ljffg df
+a a b b c c
+xy yx zxy zx xzy xxx
+Output
+e j ab cd df asd ljffg 
+a a b b c c 
+xy yx zx zxy xzy xxx 
+Input
+4
+aabc ddfd fbbe f baaad
+fddf badcf aedbe cdb ae bbd
+ada bc eaced dadab b aabc fbee
+bedaf edde fcaa adbf beec
+Output
+f aabc ddfd fbbe baaad 
+ae cdb bbd fddf badcf aedbe 
+b bc ada aabc fbee eaced dadab 
+edde fcaa adbf beec bedaf 
