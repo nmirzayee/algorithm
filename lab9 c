@@ -1,0 +1,49 @@
+def solve():
+    A = input().strip()
+    B = input().strip()
+    n = len(A)
+
+    AA = A + A
+    T = B + "#" + AA
+    pi = [0] * len(T)
+
+    # Compute prefix function
+    for i in range(1, len(T)):
+        j = pi[i - 1]
+        while j > 0 and T[i] != T[j]:
+            j = pi[j - 1]
+        if T[i] == T[j]:
+            j += 1
+        pi[i] = j
+
+    ans = 10**18
+    L = len(B)
+
+    # Look for full matches of B in A+A
+    for i in range(len(T)):
+        if pi[i] == L:
+            # start index of match inside AA
+            p = i - 2*n  # i - len(B) - 1
+            # Only positions < n valid
+            if 0 <= p < n:
+                k = (n - p) % n
+                ans = min(ans, k)
+
+    print(ans if ans != 10**18 else -1)
+
+Read A and B.
+
+Build T = B + '#' + (A+A).
+
+Compute prefix function.
+
+Every position where pi[i] == len(B) → match starts at some index p in A+A.
+
+Check if p < n (only the first cycle valid).
+
+Compute shift:
+k = n - p
+
+Keep the minimum k.
+
+If no match → print -1.
