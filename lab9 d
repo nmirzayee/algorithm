@@ -1,0 +1,65 @@
+🔑 Problem Understanding
+
+Previous city = prev_city
+
+Olzhas knows a list of cities = [city1, city2, ..., cityN]
+
+Goal: Find all cities whose prefix matches the longest possible suffix of prev_city.
+
+Example:
+
+prev_city = "Kokshetau"
+Olzhas cities = ["Astana", "Tauemel", "Tainan", "Almaty", "Budapest"]
+
+
+Check suffixes of "Kokshetau": "u", "au", "tau", …
+
+Find cities starting with "tau" → "Tauemel"
+
+🔍 Step-by-step Algorithm
+
+Let prev = prev_city
+
+Let cities = [city1, city2, ..., cityN]
+
+Initialize max_len = 0
+
+Initialize answers = []
+
+For each city in cities:
+
+For l from 1 to len(prev):
+
+Compare prev[-l:] (suffix of length l) with city[:l] (prefix of length l) ignoring case? (No, case matters here)
+
+Keep track of maximum matching suffix length
+
+After checking all cities, output all cities whose matching length = max_len
+
+Time complexity: O(n * m), n = number of cities, m = length of city names → acceptable for ≤ 10⁴ cities
+
+
+def solve():
+    prev = input().strip()
+    n = int(input())
+    cities = [input().strip() for _ in range(n)]
+    
+    max_len = 0
+    result = []
+    
+    for city in cities:
+        max_match = 0
+        for l in range(1, min(len(prev), len(city)) + 1):
+            if prev[-l:].lower() == city[:l].lower():
+                max_match = l
+
+        if max_match > max_len:
+            max_len = max_match
+            result = [city]
+        elif max_match == max_len and max_len > 0:
+            result.append(city)
+    
+    print(len(result))
+    for city in result:
+        print(city)
+solve()
