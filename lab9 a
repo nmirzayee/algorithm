@@ -1,0 +1,75 @@
+def solve():
+    A = input().strip()
+    B = input().strip()
+
+    # If A already contains B
+    if B in A:
+        print(1)
+        return
+
+    # We will repeat A until its length >= len(B)
+    # Usually, answer is at most len(B)//len(A) + 2
+    s = A
+    count = 1
+    while len(s) < len(B):
+        s += A
+        count += 1
+
+    # Check if B is inside the current string
+    if B in s:
+        print(count)
+        return
+
+    # Try one more extension
+    s += A
+    count += 1
+
+    if B in s:
+        print(count)
+    else:
+        print(-1)
+solve()
+
+
+Explanation (Why this algorithm is optimal)
+
+We want the minimum number of times A must be repeated so that B becomes a substring.
+
+Key facts:
+
+If B is already inside A → answer is 1
+
+Otherwise, we repeat A until its length reaches or exceeds len(B)
+
+Maximum repetitions needed = len(B) // len(A) + 2
+
+Because once the repeated A is longer than B by at most one copy, any overlap is covered
+
+We use Python’s fast substring search (optimized Boyer–Moore/Horspool in C), which is fastest in practice.
+
+✔️ Example
+
+Input:
+
+abcd
+cdabcdab
+
+
+Process:
+
+A repeated 1 time → "abcd" (B not inside)
+
+A repeated 2 times → "abcdabcd" (B not inside)
+
+A repeated 3 times → "abcdabcdabcd" (B inside)
+
+Output:
+
+3
+
+
+If you want, I can also give:
+
+✅ A version using Rabin–Karp
+✅ A version using KMP prefix function
+✅ A version using Z-function
