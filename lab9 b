@@ -1,0 +1,202 @@
+def solve():
+    P, k = input().split()
+    k = int(k)
+    S = input().strip()
+
+    merge = P + "#" + S
+    n = len(merge)
+    pi = [0] * n
+
+    for i in range(1, n):
+        j = pi[i - 1]
+        while j > 0 and merge[i] != merge[j]:
+            j = pi[j - 1]
+        if merge[i] == merge[j]:
+            j += 1
+        pi[i] = j
+
+    L = len(P)
+    count = 0
+
+    for x in pi:
+        if x == L:
+            count += 1
+
+    print("YES" if count >= k else "NO")
+solve()
+
+.
+
+🔑 Goal of the Problem
+
+We have:
+
+A password string P
+
+A long text string S
+
+An integer k
+
+We must check:
+
+👉 Does P occur in S at least k times?
+
+If yes → print YES,
+otherwise NO.
+
+Occurrences may overlap.
+
+🔥 Why we use Prefix Function (KMP)?
+
+We must find all occurrences of P inside S efficiently.
+
+S can be very large (up to 10⁶ characters)
+
+P can also be large
+
+Counting by scanning repeatedly is too slow
+
+Python’s count() and find() won't count overlapping matches correctly
+
+KMP prefix function is optimal:
+
+🟢 Time complexity: O(|P| + |S|)
+🟢 Works for overlapping matches
+🟢 Fast enough for any input limits
+
+🧠 Prefix Function (π-array) — What it represents?
+
+For a string T,
+pi[i] = length of the longest proper prefix of T
+which is also a suffix ending at position i.
+
+Example:
+T = "abcab"
+π = [0, 0, 0, 1, 2]
+
+This means:
+
+At index 4, "abcab" ends with "ab" → prefix "ab" matches suffix "ab" → pi=2
+
+🎯 How does this help us find P in S?
+
+We create a combined string:
+
+T = P + '#' + S
+
+
+Example:
+
+P = "hello"
+S = "helloThomashello"
+
+T = "hello#helloThomashello"
+
+Why add '#'?
+
+It's a delimiter so P never accidentally overlaps with itself in the merge.
+
+Ensures all matches in S are detected.
+
+🔍 Core idea
+
+When scanning T and computing π-array:
+
+👉 If at any position i, π[i] == len(P),
+it means:
+
+⭐ A full copy of P ends here inside S.
+
+So we count every such match.
+
+🔄 Step-by-step simulation
+
+Let:
+
+P = "hello" → length 5
+S = "helloThomashelloJohnhello"
+
+We build:
+
+"hello#helloThomashelloJohnhello"
+
+
+We compute π for the whole merged string.
+
+During the π computation:
+
+When π[i] = 5
+→ The suffix ending at i matches the prefix "hello"
+→ So "hello" occurs ending at that position
+→ Count occurrence
+
+If we count ≥ k → password is correct.
+
+🧩 Why does this match substring search exactly?
+
+Because the prefix function tries to match:
+
+P  
+#  
+S
+
+
+It repeatedly compares characters from P to characters in S
+
+If mismatch: uses the prefix values to "jump" quickly, avoiding re-checks
+
+Whenever a full match is found, π becomes = len(P)
+
+This is exactly how substring search is done in KMP.
+
+💡 Example
+
+Input:
+
+hello 2
+helloThomashello
+
+
+Merged:
+
+hello#helloThomashello
+
+
+π-array contains three indices where π[i] = 5 → matches "hello".
+
+count = 3 ≥ 2
+→ print YES
+
+🧠 Why does this find overlapping matches?
+
+Example:
+P = "aaa"
+S = "aaaaa"
+
+Matches at indices:
+
+aaa
+ aaa
+  aaa
+
+
+Prefix function naturally counts all these overlaps because:
+
+It doesn't reset to zero after a match
+
+It continues from pi[last]
+
+This makes it better than naive search.
+
+🏁 Summary (simple version)
+
+Build string: P + '#' + S
+
+Compute π-array.
+
+Every time π[i] == len(P),
+a full occurrence of P ends at position i.
+
+Count all such matches.
+
+If count ≥ k → YES, else NO.
