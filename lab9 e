@@ -1,1 +1,108 @@
 
+def solve():
+    import sys
+    input = sys.stdin.readline
+
+    t = int(input())
+    for _ in range(t):
+        line = input().split()
+        s = line[0]
+        k = int(line[1])
+        n = len(s)
+        
+        # Compute overlap
+        pi = [0]*n
+        for i in range(1, n):
+            j = pi[i-1]
+            while j > 0 and s[i] != s[j]:
+                j = pi[j-1]
+            if s[i] == s[j]:
+                j += 1
+            pi[i] = j
+        
+        overlap = pi[-1]
+        min_length = n + (k-1)*(n - overlap)
+        print(min_length)
+solve()
+
+Problem Understanding
+
+We are asked to construct the shortest possible string (task name) such that:
+
+A given substring s appears at least k times.
+
+The goal: minimize the length of the resulting string.
+
+Step 1: Observation
+
+If we just concatenate s k times, the length = len(s) * k. ✅ This always works.
+
+But maybe we can overlap repeated occurrences to make the string shorter.
+
+Example:
+
+s = "aa" and k = 3
+
+Naive concatenation: "aa" + "aa" + "aa" → "aaaaaa" → length 6
+
+But "aaa" contains "aa" 3 times: "aa" (1-2), "aa" (2-3), "aa" (3-4)
+
+So the minimal length = len(s) + (k-1) * overlap_length
+
+Step 2: Overlap Calculation
+
+Overlap = length of the longest suffix of s which is also a prefix of s.
+
+Denote: overlap = longest proper prefix which is also suffix (LPS)
+
+Example:
+
+s = "aaa"
+
+Proper prefixes: "a", "aa"
+
+Suffixes: "a", "aa"
+
+Longest matching = "aa" → overlap = 2
+
+So to add another "aaa" after first "aaa", we only need 1 extra character → minimal concatenation.
+
+Step 3: Minimal Length Formula
+
+Let:
+
+n = len(s)
+
+k = number of occurrences
+
+overlap = length of longest proper prefix = suffix
+
+Then minimal length:
+
+\text{min_length} = n + (k-1) \times (n - overlap)
+
+First copy = n
+
+Each additional copy adds only n - overlap characters
+
+Works for any s and k
+
+Step 4: Compute Overlap (KMP LPS)
+
+Use prefix function (pi-array) from KMP algorithm.
+
+overlap = pi[-1]
+
+Python implementation:
+
+def longest_prefix_suffix(s):
+    n = len(s)
+    pi = [0] * n
+    for i in range(1, n):
+        j = pi[i-1]
+        while j > 0 and s[i] != s[j]:
+            j = pi[j-1]
+        if s[i] == s[j]:
+            j += 1
+        pi[i] = j
+    return pi[-1]
