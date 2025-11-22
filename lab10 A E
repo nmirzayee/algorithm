@@ -1,0 +1,204 @@
+Thought Process
+Initial state: All cells with 2 are starting points (time = 0).
+
+Spreading rule: Each minute, Mario spreads to adjacent cells (up, down, left, right) that contain a brown mushroom (1).
+
+Goal: All 1s should become visited. If any 1 remains unvisited, return -1.
+
+Answer: The maximum time any cell was reached (or 0 if no mushrooms initially).
+
+Algorithm
+Push all Mario positions into a queue with distance 0.
+
+Run BFS, only allowing moves into cells with value 1.
+
+Convert 1 to 2 when visited (or just mark visited separately).
+
+Keep track of the maximum time taken.
+
+After BFS, check if any 1 remains — if yes, return -1.
+
+Complexity
+Time: O(m × n) — each cell processed once.
+
+Space: O(m × n) — for the queue and visited tracking.
+
+Implementation
+cpp
+#include <iostream>
+#include <vector>
+#include <queue>
+using namespace std;
+
+struct Cell {
+    int x, y, time;
+};
+
+int main() {
+    int m, n;
+    cin >> m >> n;
+    
+    vector<vector<int>> grid(m, vector<int>(n));
+    queue<Cell> q;
+    int mushrooms = 0;
+    
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            cin >> grid[i][j];
+            if (grid[i][j] == 2) {
+                q.push({i, j, 0});
+            } else if (grid[i][j] == 1) {
+                mushrooms++;
+            }
+        }
+    }
+    
+    if (mushrooms == 0) {
+        cout << 0 << endl;
+        return 0;
+    }
+    
+    int dx[] = {1, -1, 0, 0};
+    int dy[] = {0, 0, 1, -1};
+    
+    int maxTime = 0;
+    int crushed = 0;
+    
+    while (!q.empty()) {
+        Cell curr = q.front();
+        q.pop();
+        
+        for (int d = 0; d < 4; d++) {
+            int nx = curr.x + dx[d];
+            int ny = curr.y + dy[d];
+            
+            if (nx >= 0 && nx < m && ny >= 0 && ny < n && grid[nx][ny] == 1) {
+                grid[nx][ny] = 2; // crushed by Mario
+                crushed++;
+                int newTime = curr.time + 1;
+                maxTime = max(maxTime, newTime);
+                q.push({nx, ny, newTime});
+            }
+        }
+    }
+    
+    if (crushed != mushrooms) {
+        cout << -1 << endl;
+    } else {
+        cout << maxTime << endl;
+    }
+    
+    return 0;
+}
+explain problem E algorithm
+For Problem E: KH20 - potassium hydroxide, let me explain the algorithm step by step.
+
+Problem Restatement
+We have:
+
+n chemical elements
+
+An n × n matrix where a[i][j] = 1 means element i can be added to element j
+
+Diagonal is always 1 (elements are self-compatible)
+
+Queries: each gives 3 elements, check if all 3 can be safely mixed together
+
+Safe mixing: Every pair among the 3 elements must be mutually compatible - meaning both a[i][j] = 1 AND a[j][i] = 1 for every pair.
+
+Key Insight
+This is essentially checking if the 3 elements form a complete bidirectional subgraph (a triangle where all edges go both ways).
+
+Algorithm Steps
+Step 1: Preprocessing - Build Mutual Compatibility Matrix
+We create a new matrix mutual where:
+
+cpp
+mutual[i][j] = (a[i][j] == 1 && a[j][i] == 1)
+This tells us if elements i and j can be safely mixed in both directions.
+
+Step 2: Query Checking
+For each query with elements (x, y, z):
+
+cpp
+if (mutual[x][y] && mutual[y][z] && mutual[z][x])
+    print "YES"
+else
+    print "NO"
+Why This Works
+Mathematical Reasoning
+We need to check 6 directed relationships:
+
+x→y and y→x
+
+x→z and z→x
+
+y→z and z→y
+
+But if we check just these 3 mutual pairs:
+
+mutual[x][y] covers x→y and y→x
+
+mutual[y][z] covers y→z and z→y
+
+mutual[z][x] covers z→x and x→z
+
+This covers all 6 required directed relationships.
+
+Graph Theory View
+Think of elements as nodes
+
+Draw edge i↔j only if mutual[i][j] = true
+
+Then we're checking if (x, y, z) form a triangle in this undirected mutual graph
+
+Example Walkthrough
+Given:
+
+text
+n=4, matrix:
+1 1 0 1
+1 1 1 1  
+0 1 1 0
+1 1 0 1
+Build mutual matrix:
+
+mutual[0][1] = (1&&1) = 1
+
+mutual[0][2] = (0&&0) = 0
+
+mutual[0][3] = (1&&1) = 1
+
+etc.
+
+Query (1, 1, 3) → elements 0, 0, 2 (0-based):
+
+mutual[0][0] = 1 (self)
+
+mutual[0][2] = 0 → fails → "NO"
+
+Complexity Analysis
+Preprocessing: O(n²) to build mutual matrix
+
+Per Query: O(1) - just 3 lookups
+
+Total: O(n² + q) - efficient for n≤1000, q≤100,000
+
+Optimization with Bitsets
+For even better performance, we can use bitset:
+
+cpp
+vector<bitset<1000>> mutual(n);
+This makes the checks even faster and more memory-efficient.
+
+Summary
+The algorithm is efficient and straightforward:
+
+Convert directed compatibility to mutual compatibility
+
+Check if all 3 pairs in the query are mutually compatible
+
+No need for BFS/DFS - simple matrix lookups suffice
+
+This works because the problem reduces to checking if 3 nodes form a complete bidirectional triangle in the compatibility graph.
+
