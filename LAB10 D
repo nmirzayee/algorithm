@@ -1,0 +1,165 @@
+🔵 Problem Summary
+
+You have an undirected graph with n vertices, m edges
+
+Initially all vertices are black
+
+Two types of queries:
+
+Type 1: 1 x
+
+Turn vertex x red.
+
+Type 2: 2 x
+
+Print distance from x to the nearest red vertex
+If no red exists → print -1
+
+❗ Important
+
+We must answer many queries fast — doing BFS from x for each query = TLE.
+
+We need an online dynamic BFS idea.
+
+✅ Correct Insight: Multi-Source BFS
+
+Keep a queue of all red vertices.
+
+Maintain:
+
+dist[v] = distance from v to nearest red
+
+
+Initially:
+
+No red → all dist = INF (or -1)
+
+When a vertex becomes red (operation ❗ 1 x):
+
+If it's already red — skip
+
+Else:
+
+Set dist[x] = 0
+
+Push it into BFS queue
+
+Then run incremental BFS:
+
+While the BFS queue has items:
+
+Try to relax distances of neighbours
+
+Same idea as Dijkstra with all red nodes as sources, but edges are unweighted so BFS.
+
+This guarantees each edge is processed at most once → total time O(n + m).
+
+🧠 Algorithm
+Initialization:
+dist[i] = INF for all i
+queue Q is empty
+
+For each query:
+✔ Query type 1: 1 x
+if dist[x] != 0:
+    dist[x] = 0
+    Q.push(x)
+    run BFS update while possible
+
+✔ Query type 2: 2 x
+if dist[x] is INF → print -1
+else → print dist[x]
+
+🌟 WORKED EXAMPLE
+
+Input:
+
+5 4 7
+1 2
+2 3
+3 4
+4 5
+2 1
+1 1
+2 1
+2 2
+2 5
+1 3
+2 5
+
+
+Graph:
+1—2—3—4—5
+
+Queries:
+
+2 1 → no red yet → -1
+
+1 1 → red = {1}
+
+2 1 → nearest red = itself → 0
+
+2 2 → nearest red = 1 → 1
+
+2 5 → dist = 4 → 4
+
+1 3 → red = {1,3}, update BFS
+
+2 5 → closest red = 3 → 2
+
+Matches output.
+
+✅ C++ Code (Efficient: O(n + m + q))
+#include <bits/stdc++.h>
+using namespace std;
+
+static const int INF = 1e9;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n, m, q;
+    cin >> n >> m >> q;
+
+    vector<vector<int>> g(n + 1);
+    for (int i = 0; i < m; i++) {
+        int u, v;
+        cin >> u >> v;
+        g[u].push_back(v);
+        g[v].push_back(u);
+    }
+
+    vector<int> dist(n + 1, INF);
+    queue<int> bfs;
+
+    while (q--) {
+        int t, x;
+        cin >> t >> x;
+
+        if (t == 1) {
+            if (dist[x] != 0) {
+                dist[x] = 0;
+                bfs.push(x);
+
+                while (!bfs.empty()) {
+                    int v = bfs.front(); bfs.pop();
+                    for (int u : g[v]) {
+                        if (dist[u] > dist[v] + 1) {
+                            dist[u] = dist[v] + 1;
+                            bfs.push(u);
+                        }
+                    }
+                }
+            }
+
+        } else {  // Query type 2
+            if (dist[x] == INF) cout << -1 << "\n";
+            else cout << dist[x] << "\n";
+        }
+    }
+
+    return 0;
+}
+
+🟢 Runs in linear time, perfect for large constraints.
