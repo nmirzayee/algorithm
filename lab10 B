@@ -1,0 +1,125 @@
+✅ Problem Summary
+
+You are given:
+
+An undirected graph with n vertices
+
+The graph is given as an n×n adjacency matrix (0 = no edge, 1 = edge)
+
+You must find the shortest path length between two given vertices (start, end)
+
+If no path exists → output -1
+
+This is a classic BFS shortest path in an unweighted graph.
+
+✅ Solution Idea
+
+Since the graph is unweighted and undirected, the best algorithm is:
+
+BFS (Breadth-First Search)
+
+Because BFS always finds the shortest path in an unweighted graph.
+
+Steps:
+
+Read n
+
+Read the n × n adjacency matrix
+
+Convert to graph (adjacency list or use matrix directly)
+
+BFS starting from start
+
+Track distances using a dist[] array initialized with -1
+
+If end is reached → return distance
+
+Otherwise print -1
+
+✅ Example 1 Checked
+
+Input:
+
+5
+0 1 0 0 1
+1 0 1 0 0
+0 1 0 0 0
+0 0 0 0 0
+1 0 0 0 0
+3 5
+
+
+Graph connections:
+
+3 → 2
+
+2 → 1
+
+1 → 5
+
+Path: 3 → 2 → 1 → 5, length = 3
+
+Matches output.
+
+✅ Correct C++ Code (AC solution)
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+
+    vector<vector<int>> g(n, vector<int>(n));
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            cin >> g[i][j];
+
+    int start, finish;
+    cin >> start >> finish;
+
+    start--; 
+    finish--;
+
+    vector<int> dist(n, -1);
+    queue<int> q;
+
+    dist[start] = 0;
+    q.push(start);
+
+    while (!q.empty()) {
+        int v = q.front();
+        q.pop();
+
+        for (int u = 0; u < n; u++) {
+            if (g[v][u] == 1 && dist[u] == -1) {
+                dist[u] = dist[v] + 1;
+                q.push(u);
+            }
+        }
+    }
+
+    cout << dist[finish] << endl;
+    return 0;
+}
+
+✅ Python version (if you need)
+from collections import deque
+
+n = int(input())
+g = [list(map(int, input().split())) for _ in range(n)]
+start, end = map(int, input().split())
+start -= 1
+end -= 1
+
+dist = [-1] * n
+q = deque([start])
+dist[start] = 0
+
+while q:
+    v = q.popleft()
+    for u in range(n):
+        if g[v][u] == 1 and dist[u] == -1:
+            dist[u] = dist[v] + 1
+            q.append(u)
+
+print(dist[end])
