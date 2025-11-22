@@ -1,0 +1,124 @@
+✅ How to solve “Number of Islands”
+
+You are given an n × m grid of characters:
+
+'1' = land
+
+'0' = water
+
+You must count how many connected components of land exist.
+Cells are connected only up, down, left, right (NOT diagonally).
+
+✅ Solution idea (DFS or BFS)
+
+We scan every cell:
+
+If the cell is '1', this is the start of a new island → increment answer.
+
+Run DFS/BFS from this cell to mark the entire island as visited.
+
+Continue scanning.
+
+Equivalent to counting the number of connected components in the grid.
+
+✅ C++ implementation (DFS)
+
+✔ Works for all constraints
+✔ Simple and fast
+
+#include <bits/stdc++.h>
+using namespace std;
+
+int n, m;
+vector<string> grid;
+vector<vector<bool>> visited;
+
+int dx[4] = {1, -1, 0, 0};
+int dy[4] = {0, 0, 1, -1};
+
+void dfs(int x, int y) {
+    visited[x][y] = true;
+
+    for (int i = 0; i < 4; i++) {
+        int nx = x + dx[i];
+        int ny = y + dy[i];
+
+        if (nx >= 0 && nx < n && ny >= 0 && ny < m &&
+            !visited[nx][ny] && grid[nx][ny] == '1') {
+            dfs(nx, ny);
+        }
+    }
+}
+
+int main() {
+    cin >> n >> m;
+
+    grid.resize(n);
+    visited.assign(n, vector<bool>(m, false));
+
+    for (int i = 0; i < n; i++) {
+        cin >> grid[i];
+    }
+
+    int islands = 0;
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (grid[i][j] == "1"[0] && !visited[i][j]) {
+                islands++;
+                dfs(i, j);
+            }
+        }
+    }
+
+    cout << islands << endl;
+    return 0;
+}
+
+✅ Example 1
+
+Input:
+
+4 5
+11110
+11010
+11000
+00000
+
+
+Output:
+
+1
+
+
+Explanation: all land is connected → 1 island.
+
+✅ Example 2
+
+Input:
+
+4 5
+11000
+11000
+00100
+00011
+
+
+Output:
+
+3
+
+
+Explanation:
+
+First island top-left
+
+Second island center
+
+Third island bottom-right
+
+If you want, I can also give:
+
+✅ BFS version
+✅ Optimized version using Union-Find
+✅ Step-by-step dry run for sample inputs
