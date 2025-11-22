@@ -1,0 +1,88 @@
+This problem is very simple: you just need to check whether s and f are in the same connected component of an undirected graph.
+
+Best methods:
+
+DFS/BFS from s, then check if f is visited
+or
+
+Union–Find (DSU / Disjoint Set Union) — fastest for large constraints.
+
+Since 
+𝑛
+≤
+100000
+n≤100000 and 
+𝑚
+≤
+99999
+m≤99999, both BFS/DFS and DSU are fine.
+
+Below is the clean DSU version (recommended for competitive programming).
+
+✅ C++ Solution using DSU
+#include <bits/stdc++.h>
+using namespace std;
+
+struct DSU {
+    vector<int> parent, sz;
+
+    DSU(int n) {
+        parent.resize(n+1);
+        sz.resize(n+1, 1);
+        for (int i = 1; i <= n; i++) parent[i] = i;
+    }
+
+    int find(int x) {
+        if (parent[x] == x) return x;
+        return parent[x] = find(parent[x]); // path compression
+    }
+
+    void unite(int a, int b) {
+        a = find(a);
+        b = find(b);
+        if (a != b) {
+            if (sz[a] < sz[b]) swap(a, b);
+            parent[b] = a;
+            sz[a] += sz[b];
+        }
+    }
+};
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n, m;
+    cin >> n >> m;
+
+    DSU dsu(n);
+
+    for (int i = 0; i < m; i++) {
+        int x, y;
+        cin >> x >> y;
+        dsu.unite(x, y);
+    }
+
+    int s, f;
+    cin >> s >> f;
+
+    if (dsu.find(s) == dsu.find(f))
+        cout << "YES\n";
+    else
+        cout << "NO\n";
+
+    return 0;
+}
+
+🧠 How DSU Works Here
+
+Each node starts in its own component.
+
+For every edge (x, y) → merge components.
+
+At the end, simply check:
+
+if find(s) == find(f) → same component
+
+
+Runs in O((n + m) α(n)), essentially linear.
