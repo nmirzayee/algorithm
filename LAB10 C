@@ -1,0 +1,116 @@
+✅ Problem Summary
+You are given numbers n and m.
+You can:
+
+
+x = x * 2
+
+
+x = x - 1
+
+
+Goal: transform n → m using minimum number of operations, and print the whole path.
+This is a known greedy problem.
+
+✅ Correct Strategy
+We should work backwards from m to n, because:
+
+
+If m is odd, the last step must have been:
+x = x * 2 → previous number = (m + 1) / 2
+
+
+If m is even, the last step could be:
+x = x * 2 → previous = m / 2
+
+
+If m < n, we can only do:
+x = x - 1 forward
+→ backward: m + 1, m + 2, …, n
+
+
+So reverse operations:
+While m > n:
+
+
+If m is even → m /= 2
+
+
+Else → m += 1
+
+
+Then, when m == n, stop.
+At the end reverse the path.
+
+🧠 Examples
+Example 1
+n = 5, m = 9
+
+Start from 9:
+
+
+9 is odd → 9 → 10
+
+
+10 is even → 10 → 5
+
+
+Reverse: 5 → 10 → 9
+Output:
+2
+10 9
+
+
+🧠 Example 2
+n = 4, m = 8
+
+8 even → 8 → 4
+Reverse: 4 → 8
+Correct.
+
+🧠 Example 3
+4 4
+
+Already equal → 0 operations.
+
+✅ C++ Code (Accepted Solution)
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+
+    if (n == m) {
+        cout << 0;
+        return 0;
+    }
+
+    vector<int> path;
+
+    int x = m;
+    while (x > n) {
+        path.push_back(x);
+        if (x % 2 == 0)
+            x /= 2;
+        else
+            x += 1;
+    }
+
+    while (x < n) {
+        path.push_back(x);
+        x++;
+    }
+    // Now x == n
+    reverse(path.begin(), path.end());
+
+    cout << path.size() << "\n";
+    for (int i = 0; i < path.size(); i++)
+        cout << path[i] << " ";
+}
+
+
+✔ Output exactly matches required format.
+
+❓ Want the Python version?
+Just say “Python solution”.
