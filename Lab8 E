@@ -1,0 +1,211 @@
+Below is a complete explanation of:
+
+What the problem is actually asking
+
+How to solve the problem (the idea behind the solution)
+
+Clear explanation of your code line-by-line
+
+This will let you fully understand the entire task.
+
+🟩 1. WHAT IS THE PROBLEM ABOUT? (Human Explanation)
+
+You are given n numbers:
+
+L0, L1, L2, ..., L(n-1)
+
+
+These numbers were produced by encoding a secret string using the rule:
+
+For the secret characters:
+
+c0, c1, c2, ..., c(n-1)
+
+
+Convert each to a number:
+
+'a' → 0
+'b' → 1
+'c' → 2
+...
+'z' → 25
+
+
+Let these numbers be:
+
+v0, v1, v2, ..., v(n-1)
+
+
+Then each Li is computed as:
+
+L0 = v0 * 1
+L1 = v0 * 1 + v1 * 2
+L2 = v0 * 1 + v1 * 2 + v2 * 4
+L3 = v0 * 1 + v1 * 2 + v2 * 4 + v3 * 8
+...
+Li = Σ (vj * 2^j)
+
+
+So each Li contains the sum of all previous character values multiplied by powers of 2.
+
+🟦 2. WHAT IS THE TASK? (Your Job)
+
+You must decode the original string from these cumulative sums.
+
+For each Li, extract the new character value.
+
+🟨 3. HOW TO SOLVE IT (Algorithm Idea)
+
+We know that:
+
+Li = previous_sum + vi * 2^i
+
+
+Let:
+
+prev = previous_sum = L(i-1)
+power = 2^i
+
+
+Then the current character value is:
+
+vi = (Li - prev) / power
+
+
+Once we get vi, we convert it back:
+
+0 → 'a'
+1 → 'b'
+2 → 'c'
+...
+
+🟥 4. EXAMPLE (VERY IMPORTANT)
+
+Suppose the encoded numbers are:
+
+1 3 11
+
+
+Decode them:
+
+i = 0:
+prev = 0
+power = 1
+v0 = (1 - 0)/1 = 1 → 'b'
+prev = 1
+power = 2
+
+i = 1:
+v1 = (3 - 1)/2 = 1 → 'b'
+prev = 3
+power = 4
+
+i = 2:
+v2 = (11 - 3)/4 = 2 → 'c'
+
+
+So decoded string = "bbc".
+
+🟩 5. CODE EXPLANATION LINE-BY-LINE
+
+Now let’s explain exactly what your code does.
+
+🔹 Input and setup
+long long n;
+cin >> n;
+
+
+You read how many encoded values there are.
+
+🔹 Variables used for decoding
+long long prev = 0;
+vector<char> str;
+long long power_base = 1;
+long long base = 2;
+
+
+prev → stores previous encoded sum (L(i−1))
+
+str → where we store the decoded characters
+
+power_base → stores 2^i for decoding
+
+base = 2 → fixed because the encoding uses powers of 2
+
+🔹 Main decoding loop
+while(n--) {
+    long long length;
+    cin >> length;
+
+
+length = current Li (encoded value).
+
+🔹 Decode the character value
+long long sAsci = (length - prev) / power_base;
+
+
+This applies:
+
+vi = (Li - L(i-1)) / 2^i
+
+
+This extracts the character's numeric value (0 to 25).
+
+🔹 Convert number to letter
+char s = sAsci + 'a';
+str.push_back(s);
+
+
+if sAsci = 0 → 'a'
+
+if sAsci = 1 → 'b'
+
+etc.
+
+Then the character is added to the result string.
+
+🔹 Update prev and power
+prev = length;
+power_base = power_base * base;
+
+
+prev becomes the current total, ready for next iteration
+
+power_base becomes 2^(i+1) for the next character
+
+🔹 Print the decoded message
+for(char &s: str) {
+    cout << s;
+}
+
+
+Print all letters together (the decoded string).
+
+🟩 6. COMPLETE SUMMARY (Very Short)
+❗The problem:
+
+You are given encoded numbers describing a string using cumulative sums with powers of 2.
+
+❗Your job:
+
+Recover the original string.
+
+❗How:
+
+At step i:
+
+vi = (Li − L(i-1)) / 2^i
+
+
+Convert vi to a character.
+
+❗Your code:
+
+Implements exactly this decoding process using prev and power_base.
+
+If you want, I can provide:
+
+✅ A rewritten cleaner version
+✅ A version with 64-bit safety
+✅ A diagram showing how encoding works
+✅ More examples to practice decoding
