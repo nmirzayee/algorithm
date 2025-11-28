@@ -1,0 +1,155 @@
+✅ WHAT THE CODE IS DOING
+
+You are given:
+
+vertexCount — number of vertices (1 to n)
+
+edgeCount — number of edges
+
+a graph described by edges.
+
+But instead of building the graph normally, the algorithm adds vertices one by one in reverse order (from n to 1) and tracks:
+
+👉 How many connected components exist after each vertex is added?
+
+This is a known trick for problems like:
+
+"Offline dynamic connectivity"
+
+"How many components after removing nodes?"
+
+"Reverse delete + DSU fix"
+
+✅ BREAKDOWN OF THE CODE
+1. DSU (Disjoint Set Union)
+
+You have:
+
+int dsuParent[MAX_VERTICES], dsuRank[MAX_VERTICES];
+
+
+initializeDSU() sets each node as its own parent:
+
+dsuParent[i] = i;
+dsuRank[i] = 1;
+
+2. findRoot() — Path compression
+int findRoot(int v) {
+    return (dsuParent[v] == v) ? v : (dsuParent[v] = findRoot(dsuParent[v]));
+}
+
+
+This:
+
+Follows parents until root is found
+
+Compresses the path → makes future queries faster (almost O(1))
+
+3. uniteSets() — Union by rank
+bool uniteSets(int a, int b)
+
+
+Finds roots
+
+Merges smaller tree into larger
+
+Increases rank when equal
+
+Returns false if the nodes are already in the same set
+
+Returns true if a union happened
+
+🔥 MAIN IDEA OF THE ALGORITHM
+
+The key part:
+
+for (int currentVertex = vertexCount; currentVertex >= 1; currentVertex--) {
+    componentCount++;
+
+
+We start with an empty graph (no vertices active).
+
+Then we turn on vertices in reverse:
+
+add vertex n
+add vertex n−1
+add vertex n−2
+...
+
+
+When we activate a vertex:
+
+It forms its own connected component → componentCount++
+
+Then we check all edges from this vertex:
+
+for (int neighbor : adjacencyList[currentVertex])
+
+
+But we only consider neighbors that were already activated:
+
+if (currentVertex < neighbor)
+
+
+Why?
+
+Because we’re activating nodes from n → 1, so:
+
+If neighbor > currentVertex → neighbor is already in graph
+
+If neighbor < currentVertex → neighbor isn’t activated yet
+
+If two active vertices are connected:
+
+if (findRoot(currentVertex) != findRoot(neighbor)) {
+    componentCount--;
+    uniteSets(currentVertex, neighbor);
+}
+
+
+Meaning:
+
+They belonged to two distinct components
+
+After merging, total components reduce by 1
+
+📌 4. Store the result for each step
+connectedComponents.push_back(componentCount);
+
+
+Finally reverse the array because we added nodes backwards:
+
+reverse(connectedComponents.begin(), connectedComponents.end());
+
+📌 5. Output format
+
+The code prints:
+
+Number of connected components after activating vertex 2,3,…,n
+
+Finally prints 0 for vertex 1 activation.
+
+Why 0?
+
+Because after all vertices added, the last stored value equals actual components — but the problem probably asks to print n−1 results and end with zero.
+
+🧠 SUMMARY (VERY SIMPLE)
+
+This code:
+
+Reads the graph.
+
+Activates vertices from n down to 1.
+
+Uses DSU to merge edges to already-activated neighbors.
+
+Tracks the number of connected components at each step.
+
+Reverses the result to match the correct order.
+
+Prints it.
+
+This is a classical reverse DSU dynamic connectivity solution — extremely efficient:
+
+Time complexity: O((n + m) α(n))
+(Almost linear)
