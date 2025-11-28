@@ -1,0 +1,167 @@
+✅ WHAT THE PROGRAM DOES
+
+You are given:
+
+n → number of cities
+
+m → number of possible roads
+
+x → multiplier for "big" roads
+
+y → multiplier for "small" roads
+
+Each road can be one of:
+
+"big" → cost = base cost × x
+
+"small" → cost = base cost × y
+
+"both" → you can build either big or small road
+→ the code adds two different edges to the graph.
+
+The goal:
+
+Connect all cities with the minimum total cost
+
+This is exactly the Minimum Spanning Tree (MST) problem solved by Kruskal’s algorithm.
+
+✅ EXPLANATION OF EACH PART
+🔹 1. Disjoint Set Union (Union-Find)
+
+This structure helps check whether two cities are already connected.
+
+Constructor
+parent[i] = i;
+rank[i] = 0;
+
+
+Each node is its own parent at the start.
+
+findSet(v)
+
+Path-compressed "find":
+
+if (v != parent[v])
+    parent[v] = findSet(parent[v]);
+return parent[v];
+
+
+Returns the representative (root) of the component containing v.
+
+uniteSets(a, b)
+
+Union by rank:
+
+Find roots
+
+Attach the smaller tree under the larger
+
+Increase rank if both were equal
+
+This ensures optimal merging:
+
+if (rank[a] < rank[b]) swap(a, b);
+parent[b] = a;
+if (rank[a] == rank[b]) ++rank[a];
+
+🔹 2. Graph Class
+
+Stores:
+
+number of cities
+
+vector of edges
+each stored as: (cost, (cityA, cityB))
+
+addEdge
+edges.emplace_back(cost, make_pair(cityA, cityB));
+
+
+Allows adding edges with different costs.
+
+🔹 3. Kruskal’s Algorithm
+sort(edges.begin(), edges.end());
+
+
+Sort edges by increasing cost.
+
+Create DSU to track components.
+
+Loop through edges:
+if (ds.findSet(cityA) != ds.findSet(cityB)) {
+    totalCost += cost;
+    ds.uniteSets(cityA, cityB);
+}
+
+
+Meaning:
+
+If adding this road does NOT create a cycle
+
+Add its cost
+
+Merge the two cities into the same component
+
+This builds the Minimum Spanning Tree (MST).
+
+🔹 4. Reading Input in main()
+cin >> n >> m >> x >> y;
+
+
+Then for each road:
+
+string roadType;
+int cityA, cityB, cost;
+cin >> roadType >> cityA >> cityB >> cost;
+
+
+Cities are converted to 0-based:
+
+cityA - 1, cityB - 1
+
+Cost rules:
+Road Type	Added edge cost
+big	cost × x
+small	cost × y
+both	cost × x and cost × y
+
+So "both" adds two options:
+
+graph.addEdge(cost*x, A, B);
+graph.addEdge(cost*y, A, B);
+
+
+Kruskal will later choose whichever is cheaper.
+
+🔹 5. Output final MST cost
+int totalCost = graph.kruskalMST();
+cout << totalCost;
+
+✅ WHAT PROBLEM THIS SOLVES
+
+This solves:
+
+**Find the cheapest way to connect all cities,
+
+when each road has two possible construction types (big/small),
+each with different cost multipliers.**
+
+Using Kruskal ensures:
+
+no cycles
+
+minimum possible cost
+
+uses big or small road depending on which is cheaper
+
+🔥 FULL SUMMARY (VERY SHORT)
+
+Program builds a weighted graph of cities.
+
+Each road type changes its cost.
+
+"both" roads create two edges with different costs.
+
+Then it uses Kruskal’s MST to find the minimum total cost to connect all cities.
+
+DSU ensures no cycles when selecting roads
