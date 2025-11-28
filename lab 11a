@@ -1,0 +1,192 @@
+✅ BIG PICTURE — What Does This Code Do?
+
+The program processes m intervals [l, r] each having a cost.
+The goal is to connect all n points (1…n) with the minimum total cost, but connecting an interval costs the same no matter how many points inside it you connect.
+
+The interval [l, r] connects all indices between l and r, but you pay cost only once.
+
+This is similar to:
+
+✔ Minimizing the cost to make the entire array connected
+
+using interval operations.
+
+✅ KEY IDEA
+
+To build connections, the code uses:
+
+A modified Union-Find
+
+Tracking leftmost and rightmost connected element in a component
+
+Processing intervals in increasing cost (like Kruskal’s MST!)
+
+When choosing an interval, it only unions elements not yet connected inside the interval
+
+This is exactly like MST on a line but using intervals as edges.
+
+✅ 1. The Union-Find (Disjoint Set) Structure
+vector<int> parent, leftmost, rightmost;
+
+
+Each component stores:
+
+parent[i] → root of node i
+
+leftmost[i] → minimum index in this component
+
+rightmost[i] → maximum index in this component
+
+Constructor
+parent[i] = leftmost[i] = rightmost[i] = i;
+
+
+So each node starts as a separate interval.
+
+find(i)
+
+Standard path-compressed find:
+
+if (i == parent[i]) return i;
+return parent[i] = find(parent[i]);
+
+unionSets(a, b)
+a = find(a);
+b = find(b);
+if (a == b) return;
+parent[a] = b;
+leftmost[b] = min(leftmost[a], leftmost[b]);
+rightmost[b] = max(rightmost[a], rightmost[b]);
+
+
+Each merge:
+
+Makes b the parent
+
+Extends [leftmost, rightmost] to cover the entire merged range
+
+getLeftmost(i), getRightmost(i)
+
+These always return the combined interval of the component.
+
+✅ 2. Solution Class
+
+Stores:
+
+n = number of elements
+
+m = number of intervals
+
+edges = intervals stored as (cost, (l, r))
+
+addEdge
+
+Stores intervals in 0-indexed form:
+
+edges.push_back({cost, {l-1, r-1}});
+
+✅ 3. computeMinimumCost() Logic
+
+This is the heart of the algorithm.
+
+Step 1 — Sort all intervals by cost
+sort(edges.begin(), edges.end());
+
+
+Like Kruskal: try the cheapest intervals first.
+
+Step 2 — Iterate through intervals
+
+For each interval:
+
+int left = edge.second.first;   // interval left boundary
+int right = edge.second.second; // interval right boundary
+int cost = edge.first;
+
+
+Let:
+
+int representative = uf.find(left);
+
+
+represent the component containing left.
+
+Step 3 — Skip intervals already fully covered
+
+If this entire interval [left, right] is already inside a connected component, skip:
+
+if (uf.getLeftmost(rep) <= left &&
+    right <= uf.getRightmost(rep))
+{
+    continue;
+}
+
+
+This means:
+“If my current component already covers this entire interval, using it adds nothing.”
+
+Step 4 — Adjust the interval
+
+If part of the interval is already covered, shrink it:
+
+if (right inside component)
+    right = leftmost_of_component
+
+if (left inside component)
+    left = rightmost_of_component
+
+
+This finds only the relevant unconnected part.
+
+Step 5 — Union needed nodes and pay cost once
+for (int j = left; j <= right; j++) {
+    if (uf.find(rep) != uf.find(j)) {
+        uf.unionSets(rep, j);
+        components++;
+        totalCost += cost;
+    }
+}
+
+
+This is the most important part:
+
+✔ The interval cost is added every time we connect a new element.
+
+If the interval covers 5 unconnected nodes, you will pay the cost 5 times.
+
+This means the interval cost is per-connection, not per-interval.
+
+❗ Important Observation
+
+This is NOT classic MST where an interval gives 1 edge.
+
+Here, interval cost is charged once per union inside the interval.
+
+Thus if [l, r] covers k nodes that were disconnected:
+you pay cost × (k).
+
+This matches problems where applying an interval operation has a fixed cost per new connection.
+
+✅ Time Complexity
+
+Worst case:
+
+Sorting edges: O(m log m)
+
+For each interval, scanning the entire range: O(n)
+
+Total worst: O(m log m + m⋅n) (slow for large constraints)
+
+✅ Summary of Program Behavior
+
+You have n points in a line.
+
+You have m intervals [l, r] each with a cost.
+
+The goal is to connect all positions 1…n using the cheapest intervals.
+
+Intervals are applied in increasing cost order.
+
+When an interval covers new unconnected elements, each merge costs the interval’s cost.
+
+DSU tracks the connected ranges efficiently.
