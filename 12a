@@ -1,0 +1,244 @@
+✅ WHAT IS THIS PROBLEM? (ADS-Lab-12)
+
+This is the Dynamic Floyd–Warshall Reconstruction problem.
+
+You are given:
+
+✔ A weighted matrix (distance matrix)
+✔ An order of adding vertices x[1], x[2], ..., x[n]
+
+Each step:
+
+Add vertex x[k] into the graph
+
+Update all shortest paths using this vertex
+
+Compute the maximum shortest path between all currently added vertices
+
+Print the result
+
+This is a standard algorithm used in Dynamically Constructed All-Pairs Shortest Paths.
+
+✨ WHAT THE ALGORITHM REALLY DOES
+
+Let the graph initially be empty.
+
+On step k, you "activate" vertex:
+
+v = x[k]
+used[v] = true
+
+
+Then run one step of Floyd–Warshall:
+
+for all i,j:
+    dist[i][j] = min(dist[i][j], dist[i][v] + dist[v][j])
+
+
+After that, compute:
+
+max shortest path among all used vertices
+
+
+And store the answer.
+
+🔵 WHY THIS WORKS
+
+Floyd–Warshall normally does:
+
+for k = 1..n:
+  for i = 1..n:
+    for j = 1..n:
+       dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])
+
+
+This code does the same, but:
+
+✔ Vertices are processed in a custom order
+✔ After each vertex is processed, we record the answer
+
+So effectively:
+
+After processing 1st vertex → shortest paths among active vertices
+
+After processing 2 → update paths
+
+… until all vertices added
+
+This solves classic tasks like:
+
+🔹 Adding nodes one by one
+🔹 Recomputing all-pairs shortest paths
+🔹 Logging maximum shortest path after each addition
+
+This appears in many ACM/ICPC problems.
+
+🔵 NOW THE DETAILED EXPLANATION OF THE CODE
+Class MatrixProcessor
+Data members:
+int n;                // matrix size  
+int matrix[501][501]; // adjacency matrix  
+int x[501];           // order of adding vertices  
+bool used[501];       // which vertices are active  
+vector<int> ans;      // answers after each step
+
+readInput()
+
+Reads:
+
+n
+
+the distance matrix
+
+the order x[i]
+
+process()
+
+This loops over steps:
+
+Step k:
+
+Mark vertex x[k] as used
+
+Update matrix using Floyd-Warshall with vertex x[k]
+
+Compute max shortest path among used vertices
+
+Store it
+
+updateMatrix(k)
+
+Classic Floyd step:
+
+dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])
+
+
+But run only for one vertex after each step.
+
+calculateMax()
+
+Find:
+
+max shortest path among used vertices
+
+
+Meaning:
+
+max(dist[i][j]) for all used i,j
+
+printResults()
+
+Just prints all elements of ans.
+
+⭐ FULL FLOW EXAMPLE (SMALL)**
+
+Let’s suppose:
+
+n = 3
+matrix:
+0 5 9
+5 0 2
+9 2 0
+
+order x:
+3 1 2
+
+Step 1: add vertex 3
+
+Used = {3}
+
+Max path = 0
+(ans = 0)
+
+Step 2: add vertex 1
+
+Used = {3,1}
+
+Update shortest paths through vertex 1
+
+Paths among {1,3}:
+9 → 9
+Max = 9
+
+Step 3: add vertex 2
+
+Now Used = {1,2,3}
+
+Shortest paths update through 2:
+
+new shortest path 1↔3 = 1→2→3 = 2+2 = 4
+
+others remain same
+
+Max = 5
+
+Output:
+
+0
+9
+5
+
+⭐ CLEAN AND FINAL EXPLANATION CODE (same logic)
+#include <bits/stdc++.h>
+using namespace std;
+
+class MatrixProcessor {
+    static const int MAXN = 501;
+    int n;
+    int dist[MAXN][MAXN];
+    int order[MAXN];
+    bool active[MAXN];
+    vector<int> answer;
+
+public:
+    void readInput() {
+        cin >> n;
+
+        for (int i = 1; i <= n; i++)
+            for (int j = 1; j <= n; j++)
+                cin >> dist[i][j];
+
+        for (int i = 1; i <= n; i++)
+            cin >> order[i];
+    }
+
+    void process() {
+        memset(active, false, sizeof(active));
+
+        for (int step = 1; step <= n; step++) {
+            int k = order[step];
+
+            active[k] = true;
+
+            // Floyd update with vertex k
+            for (int i = 1; i <= n; i++)
+                for (int j = 1; j <= n; j++)
+                    dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
+
+            answer.push_back(getMaxAmongActive());
+        }
+    }
+
+    void printResults() {
+        for (int v : answer)
+            cout << v << "\n";
+    }
+
+private:
+    int getMaxAmongActive() {
+        int mx = 0;
+        for (int i = 1; i <= n; i++)
+            for (int j = 1; j <= n; j++)
+                if (active[i] && active[j])
+                    mx = max(mx, dist[i][j]);
+
+        return mx;
+    }
+};
+
+int main() {
+    MatrixProcessor p;
+    p.readInput();
+    p.process();
+    p.printResults();
+}
