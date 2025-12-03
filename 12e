@@ -1,0 +1,222 @@
+✅ 1. WHAT IS THE PROBLEM?
+
+You are given:
+
+n × n matrix of weights
+
+The matrix describes edges from i → j with weight cost[i][j]
+
+Your task:
+
+✔ Find ANY negative weight cycle in the graph
+✔ If exists → print YES, print the vertices in the cycle
+✔ If not → print NO
+
+This is the standard:
+"Find and output a negative cycle using Bellman–Ford"
+
+✅ 2. IDEA OF THE ALGORITHM
+
+To detect a negative cycle:
+
+Bellman–Ford fundamental fact:
+
+If after doing n iterations, you can still relax an edge →
+➡ There is a negative cycle reachable from the start
+
+Bellman–Ford normally relaxes edges n−1 times.
+
+But for detecting cycles:
+
+We run it n times
+
+If something relaxes on the n-th iteration → negative cycle exists
+
+🚀 3. HOW THE CODE WORKS STEP BY STEP
+Step 1 — Read n
+cin >> n;
+
+Step 2 — Read the graph
+
+The matrix is converted into a list of edges.
+
+For every i, j:
+
+edge from i → j with weight cost
+
+cin >> cur.cost;
+cur.a = i; // from
+cur.b = j; // to
+edges.push_back(cur);
+
+Step 3 — Try Bellman–Ford from EACH vertex
+for (int i = 0; i < n; i++) {
+    v = i;
+    findNegativeCycle();
+    if (cycle) break;
+}
+
+
+Because the negative cycle may not be reachable from vertex 0.
+
+We start from every vertex until we find a cycle.
+
+🧠 4. Inside findNegativeCycle()
+
+This function performs Bellman–Ford and attempts to extract a cycle.
+
+4.1 Initialize distances
+vector<int> d(n, INF);
+d[v] = 0;
+vector<int> p(n, -1);
+
+
+d[i] = distance from start vertex
+
+p[i] = parent (used later to recover cycle)
+
+4.2 Relax edges n times
+for (int i = 0; i < n; i++) {
+    x = -1;
+    for (each edge) {
+        if (d[a] < INF && d[b] > d[a] + cost) {
+            d[b] = max(-INF, d[a] + cost);
+            p[b] = a;
+            x = b;
+        }
+    }
+}
+
+
+If after n iterations (i == n-1) an edge relaxes → x != -1
+
+That means negative cycle exists.
+
+max(-INF, ...) prevents overflow.
+
+4.3 If x == -1 → NO CYCLE
+if (x == -1) cycle = false;
+
+4.4 If x != -1 → Extract CYCLE
+
+Bellman–Ford gives a node x inside or after the cycle.
+To get into the cycle, move n times through parents:
+
+int y = x;
+for (int i = 0; i < n; i++)
+    y = p[y];
+
+
+Now reconstruct the cycle:
+
+vector<int> path;
+for (int cur = y;; cur = p[cur]) {
+    path.push_back(cur);
+    if (cur == y && path.size() > 1) break;
+}
+reverse(path.begin(), path.end());
+
+4.5 Print cycle
+
+Output format is:
+
+YES
+cycle_length
+cycle_vertices
+
+
+Vertices printed as +1 because input is 1-indexed.
+
+✅ Final Output Logic
+
+If no starting vertex found a negative cycle:
+
+cout << "NO\n";
+
+
+Otherwise the cycle is printed inside findNegativeCycle().
+
+⭐ COMPLETE EXPLANATION CODE (SAME AS YOURS, CLEAN AND ORGANIZED)
+#include <bits/stdc++.h>
+using namespace std;
+
+struct Edge {
+    int a, b, cost;
+};
+
+int n;
+vector<Edge> edges;
+bool cycle = false;
+int v;
+
+const int INF = 1e9;
+
+void findNegativeCycle() {
+    vector<int> d(n, INF);
+    vector<int> p(n, -1);
+
+    d[v] = 0;
+    int x = -1;
+
+    // Bellman-Ford n times
+    for (int i = 0; i < n; i++) {
+        x = -1;
+        for (auto &edge : edges) {
+            if (d[edge.a] < INF) {
+                if (d[edge.b] > d[edge.a] + edge.cost) {
+                    d[edge.b] = max(-INF, d[edge.a] + edge.cost);
+                    p[edge.b] = edge.a;
+                    x = edge.b;
+                }
+            }
+        }
+    }
+
+    if (x == -1) {
+        cycle = false;
+        return;
+    }
+
+    // go inside cycle
+    int y = x;
+    for (int i = 0; i < n; i++)
+        y = p[y];
+
+    // extract cycle
+    vector<int> path;
+    for (int cur = y;; cur = p[cur]) {
+        path.push_back(cur);
+        if (cur == y && path.size() > 1) break;
+    }
+
+    reverse(path.begin(), path.end());
+
+    cout << "YES\n" << path.size() << "\n";
+    for (int v : path)
+        cout << v + 1 << " ";
+    cout << "\n";
+
+    cycle = true;
+}
+
+int main() {
+    cin >> n;
+
+    // Read matrix and build edges
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            int w;
+            cin >> w;
+            edges.push_back({i, j, w});
+        }
+    }
+
+    // Try Bellman-Ford from each vertex
+    for (int i = 0; i < n; i++) {
+        v = i;
+        findNegativeCycle();
+        if (cycle) break;
+    }
+
+    if (!cycle) cout << "NO\n";
+}
