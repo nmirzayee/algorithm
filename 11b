@@ -1,0 +1,224 @@
+✅ WHAT IS THIS PROGRAM DOING?
+
+This program constructs a complete graph from an array of numbers, where:
+
+✔ Vertices = array indices
+✔ Edge weight between i and j = elements[i] + elements[j]
+
+Then it finds the Minimum Spanning Tree (MST) of this graph using:
+
+🔵 Kruskal’s Algorithm + Disjoint Set Union (DSU)
+
+The final output → the minimum cost to connect all elements.
+
+✅ WHY BUILD A COMPLETE GRAPH WITH WEIGHT = ai + aj ?
+
+For every pair (i, j) the cost of connecting them is:
+
+weight = elements[i] + elements[j]
+
+
+Since the graph is complete:
+
+There are n * (n - 1) / 2 edges.
+
+We need to pick n - 1 edges with minimum total weight so the graph becomes connected.
+
+This is a classic MST problem, and Kruskal's algorithm is perfect for it.
+
+✅ HOW KRUSKAL’S ALGORITHM WORKS
+1️⃣ Build a list of all edges
+
+Each edge has (weight, u, v).
+
+2️⃣ Sort edges by weight
+
+Smallest edges first.
+
+3️⃣ Use DSU (Union-Find) to avoid cycles
+
+If u and v belong to different components → add edge to MST
+
+Otherwise skip it (adding it would create a cycle)
+
+4️⃣ Continue until we select n - 1 edges.
+5️⃣ Return total cost of the selected edges.
+✅ HOW DSU WORKS (EASY)
+
+DSU keeps track of connected components.
+
+Functions:
+✔ findSet(x)
+
+Returns the representative (leader) of x’s component.
+Uses path compression → makes future queries faster.
+
+✔ uniteSets(a, b)
+
+Merges two components using union by rank → balances tree height.
+
+This improves complexity from O(N²) to almost O(N log N).
+
+✅ NOW LET'S EXPLAIN THE ACTUAL CODE
+🔵 Class DisjointSet
+
+Manages the union-find structure:
+
+vector<int> parent;  // parent of each node
+vector<int> rank;    // height of trees for union by rank
+
+findSet(v)
+
+Finds the representative node using path compression.
+
+uniteSets(a, b)
+
+Merges their sets respecting union by rank.
+
+🔵 Class Graph
+
+Stores edges and vertex count.
+
+addEdge(u, v, weight)
+
+Pushes (weight, {u, v}) to edges.
+
+kruskalMST() does:
+
+Sort edges by weight
+
+For each edge, check if it connects two different sets
+
+If yes → add it to the MST and merge the sets
+
+Keep total cost
+
+Return cost
+
+🔵 MAIN PART
+Input:
+n
+elements array of size n
+
+Create complete graph:
+for i < j:
+    weight = elements[i] + elements[j]
+    addEdge(i, j, weight)
+
+Run MST:
+totalCost = graph.kruskalMST()
+
+Output answer.
+📌 EXAMPLE TO UNDERSTAND CLEARLY
+
+Suppose:
+
+n = 4
+elements = {1, 2, 5, 7}
+
+
+Edges:
+
+1+2 = 3
+
+1+5 = 6
+
+1+7 = 8
+
+2+5 = 7
+
+2+7 = 9
+
+5+7 = 12
+
+Sort edges:
+3, 6, 7, 8, 9, 12
+
+Pick 3 smallest edges that don’t form cycles:
+3 + 6 + 7 = 16
+
+Output:
+
+16
+
+⭐ CLEAN FINAL VERSION OF THE CODE (SAME LOGIC, CLEAN STYLE)
+#include <bits/stdc++.h>
+using namespace std;
+
+class DisjointSet {
+private:
+    vector<int> parent, rank;
+
+public:
+    DisjointSet(int n) {
+        parent.resize(n);
+        rank.assign(n, 0);
+        for (int i = 0; i < n; i++) parent[i] = i;
+    }
+
+    int findSet(int v) {
+        if (v != parent[v])
+            parent[v] = findSet(parent[v]);
+        return parent[v];
+    }
+
+    void uniteSets(int a, int b) {
+        a = findSet(a);
+        b = findSet(b);
+        if (a != b) {
+            if (rank[a] < rank[b]) swap(a, b);
+            parent[b] = a;
+            if (rank[a] == rank[b]) rank[a]++;
+        }
+    }
+};
+
+class Graph {
+private:
+    vector<pair<int, pair<int, int>>> edges;
+    int n;
+
+public:
+    Graph(int n) : n(n) {}
+
+    void addEdge(int u, int v, int w) {
+        edges.push_back({w, {u, v}});
+    }
+
+    int kruskalMST() {
+        sort(edges.begin(), edges.end());
+        DisjointSet ds(n);
+        int totalCost = 0;
+
+        for (auto &edge : edges) {
+            int w = edge.first;
+            int u = edge.second.first;
+            int v = edge.second.second;
+
+            if (ds.findSet(u) != ds.findSet(v)) {
+                totalCost += w;
+                ds.uniteSets(u, v);
+            }
+        }
+        return totalCost;
+    }
+};
+
+int main() {
+    int n;
+    cin >> n;
+
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+
+    Graph g(n);
+
+    for (int i = 0; i < n; i++) {
+        for (int j = i + 1; j < n; j++) {
+            g.addEdge(i, j, a[i] + a[j]);
+        }
+    }
+
+    cout << g.kruskalMST();
+    return 0;
+}
