@@ -1,0 +1,142 @@
+✅ WHAT IS THIS ALGORITHM?
+
+This program implements Prim’s Algorithm to find the Minimum Spanning Tree (MST) of a weighted graph given as an adjacency matrix.
+
+📌 Goal of Prim’s Algorithm
+
+Given a connected undirected weighted graph, find a set of edges connecting all vertices with minimum total weight and no cycles.
+
+This set of edges is called the Minimum Spanning Tree (MST).
+
+✅ HOW PRIM’S ALGORITHM WORKS (Simple Explanation)
+1️⃣ Start from any vertex
+
+This code starts from vertex 0.
+
+2️⃣ Maintain 3 arrays:
+
+visited[i]: whether vertex i is already in MST
+
+parent[i]: from which vertex we connect i into the MST
+
+minEdge[i]: smallest weight edge that connects vertex i to the current MST
+
+3️⃣ Repeat N times:
+
+At each step:
+
+✔ Choose the vertex with the minimum minEdge that is not visited.
+
+This is the next vertex to add to the MST.
+
+✔ Mark it visited.
+✔ If it has a parent → add its edge weight to total MST weight.
+✔ Update all other vertices:
+
+If the edge from the newly added vertex to vertex j is smaller than the current best edge → update:
+
+minEdge[j] = weight
+parent[j] = currentVertex
+
+✅ Important Details
+✔ minEdge[0] = 0
+
+This ensures we start from vertex 0.
+
+✔ We run N iterations
+
+Because MST always contains exactly N – 1 edges.
+
+✔ Total weight is printed
+✅ STEP-BY-STEP ALGORITHM (ELI4 — Very Clear)
+
+Read number of vertices n.
+
+Read adjacency matrix g[n][n].
+
+Start from vertex 0.
+
+Repeat n times:
+
+Pick the unvisited vertex with the smallest connection cost.
+
+Add its edge to the MST total weight.
+
+Mark it visited.
+
+Try to improve the minimum connecting edge for all other vertices.
+
+Print the total MST weight.
+
+✅ CLEAN & IMPROVED VERSION OF THE SAME CODE
+#include <iostream>
+#include <vector>
+using namespace std;
+
+const int INF = 1e9;
+
+int main() {
+    int n;
+    cin >> n;
+
+    vector<vector<int>> g(n, vector<int>(n));
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cin >> g[i][j];
+        }
+    }
+
+    vector<bool> visited(n, false);
+    vector<int> parent(n, -1);
+    vector<int> minEdge(n, INF);
+
+    minEdge[0] = 0;     // start from vertex 0
+    int totalWeight = 0;
+
+    for (int i = 0; i < n; i++) {
+
+        // 1. Pick minimum edge vertex
+        int v = -1;
+        for (int j = 0; j < n; j++) {
+            if (!visited[j] && (v == -1 || minEdge[j] < minEdge[v])) {
+                v = j;
+            }
+        }
+
+        visited[v] = true;
+
+        // 2. Add its edge to total (skip for v=0)
+        if (parent[v] != -1)
+            totalWeight += g[v][parent[v]];
+
+        // 3. Update edges
+        for (int to = 0; to < n; to++) {
+            if (!visited[to] && g[v][to] < minEdge[to]) {
+                minEdge[to] = g[v][to];
+                parent[to] = v;
+            }
+        }
+    }
+
+    cout << totalWeight;
+    return 0;
+}
+
+✅ WHY THIS SOLUTION IS CORRECT
+
+Because Prim’s algorithm always picks the lowest-cost safe edge and guarantees:
+
+✔ No cycles
+✔ All vertices connected
+✔ Minimum total weight
+
+This is exactly what the code performs.
+
+If you want, I can also give you:
+
+✅ A diagram of example graph
+✅ A dry run (step-by-step table)
+✅ Complexity analysis
+✅ Explanation of why adjacency matrix works
+
+Just tell me!
