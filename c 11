@@ -1,0 +1,147 @@
+✅ 1. What is the problem?
+
+You are given:
+
+n cities
+
+m roads
+
+Each road connects two cities (u, v)
+
+Each road has length L
+
+Each road has an allowed road material type:
+
+"big" → MUST use big asphalt
+
+"small" → MUST use small asphalt
+
+"both" → can use either big or small asphalt
+
+Costs:
+
+bigCost per km
+
+smallCost per km
+
+Your task:
+
+Choose some roads so that all cities become connected (we need a spanning tree), and the total renovation cost is as small as possible, respecting the road’s allowed asphalt type.
+
+This is a Minimum Spanning Tree (MST) problem with special edge weights.
+
+✅ 2. What is the correct algorithm?
+
+We use Kruskal’s Algorithm (classic algorithm for Minimum Spanning Tree).
+
+Why Kruskal?
+
+The roads are undirected.
+
+We want the minimum cost to connect all nodes → MST.
+
+Kruskal sorts all edges by weight and picks the cheapest that does not create cycles → perfect for this task.
+
+✅ 3. How do we calculate the weight of each road?
+
+For each road:
+
+If type = "big"
+
+✔ Must use big asphalt
+→ cost = length × bigCost
+
+If type = "small"
+
+✔ Must use small asphalt
+→ cost = length × smallCost
+
+If type = "both"
+
+✔ We can choose the cheaper one
+→ cost = length × min(bigCost, smallCost)
+
+✅ 4. Kruskal’s Algorithm – Step-by-Step
+Step 1: Convert each input road into an edge:
+edge.u = city1
+edge.v = city2
+edge.cost = calculated cost
+
+Step 2: Sort edges by cost (from smallest to largest)
+Step 3: Use DSU (Disjoint Set Union)
+
+Initially each city is separate
+
+For each edge in sorted order:
+
+If the two cities are not already connected → take the edge
+
+Add its cost
+
+Union their DSU sets
+
+Step 4: Continue until we select exactly n–1 edges
+
+This guarantees the graph becomes connected with minimal total cost.
+
+✅ 5. Why is this correct?
+
+We must connect all cities → spanning tree.
+
+To minimize the cost → choose edges with minimal possible asphalt price.
+
+Government rule is respected because we select the allowed asphalt type for each road.
+
+MST guarantees globally minimal total cost.
+
+✅ 6. Example Explanation
+
+Input:
+
+7 6
+4 3   ← bigCost=4, smallCost=3
+both 2 7 4
+both 1 7 2
+big 4 6 1
+big 3 7 3
+small 5 6 1
+both 5 7 10
+
+
+For each road, compute cost:
+
+both 2–7 (4 km)
+cost = 4 × min(4,3) = 12
+
+both 1–7 (2 km)
+cost = 2 × 3 = 6
+
+big 4–6 (1 km)
+cost = 1 × 4 = 4
+
+big 3–7 (3 km)
+cost = 3 × 4 = 12
+
+small 5–6 (1 km)
+cost = 1 × 3 = 3
+
+both 5–7 (10 km)
+cost = 10 × 3 = 30
+
+Sort by cost:
+
+3, 4, 6, 12, 12, 30
+
+
+Pick edges until 6 edges are chosen (n−1 = 6).
+
+Total = 67
+
+Matches sample output.
+
+⭐ Final Summary
+✔ Compute each road’s allowed cost
+✔ Use Kruskal’s Algorithm (sort edges + DSU)
+✔ Add cheapest edges that do NOT form cycles
+✔ Stop after selecting n–1 edges
+✔ Output total minimal cost
