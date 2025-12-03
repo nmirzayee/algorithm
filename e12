@@ -1,0 +1,157 @@
+✅ 1. What is the Problem?
+
+The code is solving a classic graph problem:
+
+Given a directed weighted graph (with N nodes and edges defined by an N×N cost matrix), detect if there is a negative cycle.
+
+If a negative cycle exists → print YES, print the cycle, and its length.
+If no negative cycle exists → print NO.
+
+This is a standard Bellman–Ford negative cycle detection problem.
+
+✅ 2. What algorithm is used?
+✔ The program uses Bellman–Ford algorithm to detect a negative cycle.
+
+Bellman–Ford:
+
+Relax all edges N times.
+
+If on the N-th iteration any distance improves → a negative cycle exists.
+
+Then reconstruct the cycle using parent pointers.
+
+This code runs Bellman–Ford starting from each vertex until a cycle is found.
+
+✅ 3. Input format according to the code
+n                   # number of nodes
+n lines each with n integers  # cost matrix
+
+
+Every pair (i, j) forms an edge:
+
+from i → j
+
+with cost = matrix[i][j]
+
+This is a complete directed graph because every i→j is included.
+
+✅ 4. Explanation of important parts of the code
+🔹 Struct Edge
+struct Edge {
+    int a, b, cost;
+};
+
+
+A directed edge from a → b with weight cost.
+
+🔹 Reading the graph
+for (i=0..n-1)
+    for (j=0..n-1)
+        read cost
+        create edge i→j
+
+
+So the graph has n² edges.
+
+✅ 5. How Bellman–Ford detects negative cycles
+Step 1 — Initialize distances
+vector<int> d(n, INF);
+d[v] = 0;
+
+
+Start Bellman–Ford from vertex v.
+
+Step 2 — Relax all edges N times
+for (i = 0; i < n; i++) {
+    x = -1;
+    for (edge in edges) {
+        if (d[edge.a] < INF) {
+            if (d[edge.b] > d[edge.a] + edge.cost) {
+                d[edge.b] = d[edge.a] + edge.cost;
+                p[edge.b] = edge.a;
+                x = edge.b;
+            }
+        }
+    }
+}
+
+
+If on the N-th iteration, x != -1, a negative cycle exists.
+
+🔥 6. Cycle exists if last relaxation changed something
+if (x == -1) cycle = false;
+else cycle = true;
+
+
+If x != -1, we found a vertex affected by a negative cycle.
+
+🔥 7. Reconstructing the negative cycle
+
+Important step:
+
+int y = x;
+for (int i = 0; i < n; i++) y = p[y];
+
+
+Why?
+Because x is reachable from a negative cycle, but not guaranteed to be inside the cycle.
+
+After n parent jumps, y will be inside the actual cycle.
+
+Then reconstruct:
+
+vector<int> path;
+for (int cur = y;; cur = p[cur]) {
+    path.push_back(cur);
+    if (cur == y && path.size() > 1) break;
+}
+reverse(path.begin(), path.end());
+
+
+This produces the cycle in correct order.
+
+🔥 8. Output
+
+If cycle exists:
+
+YES
+cycle_length
+cycle_nodes (1-based)
+
+
+If not:
+
+NO
+
+✅ 9. Why do we run Bellman–Ford from every node?
+
+Because negative cycles may not be reachable from some starting vertices.
+
+So the code does:
+
+for each v from 0 to n-1:
+    run Bellman-Ford starting at v
+    if negative cycle found → stop
+
+
+Efficient because N ≤ ~500 normally in labs.
+
+⭐ 10. Final Summary
+Algorithm used:
+
+✔ Bellman–Ford Negative Cycle Detection
+✔ Relax edges N times
+✔ If distance improves on N-th step → cycle exists
+✔ Recover cycle using parent pointers
+
+Works for:
+
+✔ directed graphs
+✔ negative edge weights
+✔ full cost matrix (n×n)
+
+Output:
+
+Prints a negative cycle if found
+
+Otherwise prints NO
